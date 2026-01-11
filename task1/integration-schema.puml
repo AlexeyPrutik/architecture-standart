@@ -1,0 +1,45 @@
+@startuml
+title Схема интеграций
+
+top to bottom direction
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Context.puml
+
+' Отделы — пользователи
+Person(sales_offices, "Продажи в сети отделений", "Сотрудники фронт-офиса")
+Person(deposits, "Обслуживание депозитных продуктов", "Сотрудники депозитного направления")
+Person(credits, "Обслуживание кредитов", "Сотрудники кредитного направления")
+Person(sales_callcenter, "Продажи через колл-центр", "Операторы колл-центра")
+Person(it, "Управление IT", "Архитекторы, DevOps, разработчики")
+Person(digital, "Команда цифровой трансформации Розничного бизнеса", "Product Owners', аналитики, разработчики")
+
+' Наши внутренние системы
+System(ibank, "Интернет-банк", "ASP.NET MVC + MS SQL")
+System(site, "Сайт", "PHP + React")
+System(abs, "АБС", "Delphi + Oracle")
+
+' Системы колл-центров и внешние
+System(callcenter, "Система колл-центра", "React + Spring Boot + PostgreSQL")
+System(sms_gateway, "СМС-шлюз телеком-оператора", )
+
+System_Ext(sms, "Телеком оператор (СМС)", "Внешний провайдер СМС")
+System_Ext(partner_cc, "Система партнерского колл-центра", "Внешняя система партнёра")
+
+' Интеграции
+Rel(sales_offices, ibank, "Работает в ИБ", "Web")
+Rel(deposits, abs, "Оформляет депозиты", "Delphi-клиент / API")
+Rel(credits, abs, "Оформляет кредиты", "Delphi-клиент / API")
+Rel(sales_offices, abs, "Оформляет заявки", "Delphi-клиент / API")
+Rel(sales_offices, deposits, "Согласование спец ставок")
+Rel(deposits, credits, "Согласование спец ставок")
+Rel(sales_callcenter, callcenter, "Работает в системе КЦ", "Web")
+Rel(it, ibank, "Разрабатывает и поддерживает")
+Rel(it, site, "Разрабатывает и поддерживает")
+Rel(it, abs, "Поддерживает интеграции")
+Rel(it, callcenter, "Разрабатывает и поддерживает")
+
+Rel(it, sms_gateway, "Поддержка СМС шлюза", "SMPP / REST")
+Rel(abs, sms_gateway, "Отправляет СМС", "SMPP / REST")
+Rel(sms_gateway, sms, "Отправляет СМС", "SMPP / REST")
+Rel(callcenter, partner_cc, "Передаёт лиды / звонки", "REST API")
+
+@enduml
