@@ -1,0 +1,24 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Container.puml
+title Передача ставок в колл-центр — Диаграмма контейнеров
+
+' === Акторы ===
+Person(client, "Клиент банка", "Обращается в колл-центр для уточнения ставок по депозитам")
+Person(callCenterStaff, "Сотрудник колл-центра", "Консультирует клиентов по актуальным депозитным ставкам")
+
+' === Системы банка ===
+System_Boundary(bankSystem, "Банк") {
+    Container(backOfficeDeposit, "Бэк-офис депозитов", "Сервис обработки ставок", "Управляет персональными и общими ставками")
+    Container(callCenterSystem, "Система колл-центра", "Внутренний сервис", "Доступ к актуальным ставкам для сотрудников кол-центра")
+}
+
+' === Внешние системы ===
+System_Ext(partnerCallCenter, "Партнёрский колл-центр", "Консультирует клиентов банка по ставкам через CSV/XLS")
+
+' === Взаимодействия ===
+Rel(callCenterStaff, callCenterSystem, "Просмотр актуальных ставок для консультаций", "REST / защищённый канал")
+Rel(callCenterSystem, backOfficeDeposit, "Получение актуальных ставок", "REST / внутренний API")
+Rel(backOfficeDeposit, partnerCallCenter, "Передача актуальных ставок в виде файлов", "CSV/XLS через защищённый канал")
+Rel(client, callCenterStaff, "Звонит для уточнения ставок")
+
+@enduml
